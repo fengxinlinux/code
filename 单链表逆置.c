@@ -20,7 +20,7 @@ typedef struct node
 
 node* reverse(node* head)
 {
-   //L是带头结点的单链表，本算法将L就地逆置
+   //head是带头结点的单链表
     node *r,*p;
     p=head->next;
     head->next=NULL;
