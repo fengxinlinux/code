@@ -21,5 +21,6 @@ int main()
        printf("%p\n",&a[i][j]);
 
     } //输出数组每个元素地址，每个元素的地址是连续的
+    free(a);
     return 0;
 }
