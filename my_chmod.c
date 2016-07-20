@@ -51,7 +51,49 @@ void chmod1(int argc,char **argv) //数字形式改权限
 
 
 }
-void chmod3(char*sh,char a,char b,char c,int mode)
+int chmod4(char*sh,char a,char c,int mode)//u=wrx类格式权限更改
+{
+    
+     switch(a)
+        {
+            case 'u':
+            if(c=='w')
+            mode=mode&~S_IWUSR&~S_IREAD&~S_IEXEC|S_IWUSR;
+            else if(c=='r')
+            mode=mode&~S_IWUSR&~S_IREAD&~S_IEXEC|S_IREAD;
+            else if(c=='x')
+            mode=mode&~S_IWUSR&~S_IREAD&~S_IEXEC|S_IEXEC;
+            else
+            printf("格式错误\n");
+            break;
+            case 'g':
+            if(c=='w')
+            mode=mode&~S_IWGRP&~S_IRGRP&~S_IXGRP|S_IWGRP;
+            else if(c=='r')
+             mode=mode&~S_IWGRP&~S_IRGRP&~S_IXGRP|S_IRGRP;
+            else if(c=='x')
+              mode=mode&~S_IWGRP&~S_IRGRP&~S_IXGRP|S_IXGRP;
+            else
+            printf("格式错误\n");
+            break;
+            case 'o':
+            if(c=='w')
+            mode=mode&~S_IWOTH&~S_IROTH&~S_IXOTH|S_IWOTH;
+            else if(c=='r')
+              mode=mode&~S_IWOTH&~S_IROTH&~S_IXOTH|S_IROTH;
+            else if(c=='x')
+              mode=mode&~S_IWGRP&~S_IRGRP&~S_IXGRP|S_IXOTH;
+            else
+            printf("格式错误\n");
+            break;
+            
+        }
+
+
+    return mode;
+    
+}
+void chmod3(char*sh,char a,char b,char c,int mode)//u+-wrx类的格式权限更改
 {
     switch(a)
     {
@@ -106,35 +148,7 @@ void chmod3(char*sh,char a,char b,char c,int mode)
                 exit(0);}
 
         }
-       else  if(b=='=')
-        {
-            if(c=='w')
-            {
-                mode=mode&S_IWUSR;
-                if(chmod(sh,mode)==-1)
-                  my_err("chmod",__LINE__);
-            }
-            else if(c=='r')
-            {
-                mode=mode&S_IREAD;
-                if(chmod(sh,mode)==-1)
-                {
-                      my_err("chmod",__LINE__);
-                }
-            }
-            else if(c=='x')
-            {
-                mode=mode&S_IEXEC;
-                if(chmod(sh,mode)==-1)
-                {
-                      my_err("chmod",__LINE__);
-                }
-            }
-            else {
-                printf("格式错误\n");
-                exit(0);}
-
-        }
+      
         else{
             printf("格式错误\n");
             exit(0);
@@ -201,39 +215,8 @@ void chmod3(char*sh,char a,char b,char c,int mode)
             else {
                 printf("格式错误\n");
                 exit(0);}
-
         }
-       else  if(b=='=')
-        {
-            if(c=='w')
-            {
-                mode=mode&S_IWGRP;
-                if(chmod(sh,mode)==-1)
-                {
-                      my_err("chmod",__LINE__);
-                }
-            }
-            else if(c=='r')
-            {
-                mode=mode&S_IRGRP;
-                if(chmod(sh,mode)==-1)
-                {
-                      my_err("chmod",__LINE__);
-                }
-            }
-            else if(c=='x')
-            {
-                mode=mode&S_IXGRP;
-                if(chmod(sh,mode)==-1)
-                {
-                      my_err("chmod",__LINE__);
-                }
-            }
-            else {
-                printf("格式错误\n");
-                exit(0);}
 
-        }
         else{
             printf("格式错误\n");
             exit(0);
@@ -302,37 +285,7 @@ void chmod3(char*sh,char a,char b,char c,int mode)
                 exit(0);}
 
         }
-       else  if(b=='=')
-        {
-            if(c=='w')
-            {
-                mode=mode&S_IWOTH;
-                if(chmod(sh,mode)==-1)
-                {
-                      my_err("chmod",__LINE__);
-                }
-            }
-            else if(c=='r')
-            {
-                mode=mode&S_IROTH;
-                if(chmod(sh,mode)==-1)
-                {
-                      my_err("chmod",__LINE__);
-                }
-            }
-            else if(c=='x')
-            {
-                mode=mode&S_IXOTH;
-                if(chmod(sh,mode)==-1)
-                {
-                      my_err("chmod",__LINE__);
-                }
-            }
-            else {
-                printf("格式错误\n");
-                exit(0);}
-
-        }
+  
         else{
             printf("格式错误\n");
             exit(0);
@@ -372,6 +325,8 @@ void chmod2(int argc,char **argv)  //字母形式改权限
         
     }
     j=0;
+   if(b!='=')
+ {
     while(c[j]!=0)
     {
       stat(ch,&buf);
@@ -379,6 +334,24 @@ void chmod2(int argc,char **argv)  //字母形式改权限
       chmod3(ch,a,b,c[j],mode);
      j++;   
 
+    }
+
+ }
+    else
+    {
+      stat(ch,&buf);
+      mode=buf.st_mode;
+     while(c[j]!=0)
+        {
+            if(j==0)
+          mode= 0|chmod4(ch,a,c[j],mode);
+            else
+            mode=mode|chmod4(ch,a,c[j],mode);
+            j++;
+
+        }
+     if(chmod(ch,mode)==-1)
+        my_err("chmod",__LINE__);
     }
 }
 int main(int argc,char **argv)
