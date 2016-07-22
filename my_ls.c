@@ -123,7 +123,7 @@ void printf_file1(struct stat buf,char *name) //l形式输出文件信息
     printf("-");
     printf(" ");
 
-    printf("%ld",buf.st_nlink);//文件链接数
+    printf("%4ld",buf.st_nlink);//文件链接数
     printf(" ");
 
     user=getpwuid(buf.st_uid);
