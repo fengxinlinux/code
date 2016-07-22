@@ -24,7 +24,7 @@
 #define flag_a  1   //对应参数为为a
 #define flag_l 2   //对应参数为l
 #define flag_R 4    //对应参数为R
-#define max 80  //每行最多输出80个字符
+#define max 200  //每行最多输出200个字符
 
 int len_max=max;
 int len_leave;
@@ -38,10 +38,10 @@ void my_err(const char*err_string,int line)    //错误输出函数
     exit(1);
 }
 
-int  panduan(char* filename)  //判断是否为..或.文件夹
+int  panduan(char* filename)  //判断是否为..或.目录,防止R参数无限递归.或..目录 
 {
     
-    int x=0;
+    int x=1;
     int i=0,j=0;
     char name[NAME_MAX+1];
     for(i=0;filename[i]!='\0';i++)
@@ -53,11 +53,10 @@ int  panduan(char* filename)  //判断是否为..或.文件夹
     }
     name[j]='\0';
     i=0;
-    while(name[i]!='\0')
+    if(name[0]=='.')
     {
-        if(name[i]!='.')
-        x=1;
-        i++;
+        if((name[1]=='\0')||(name[1]=='.'))
+        x=0;
     }
     return x;
 
@@ -151,7 +150,7 @@ void printf_file2(char *name)  //只对齐输出文件名
       len_leave=max;
 
     }
-    printf("%s",name);
+    printf("%-s",name);
     len=strlen(name);
     for(i=0;i<len_max-len;i++)
     printf(" ");
@@ -175,7 +174,7 @@ void printf_file(int flag,char* path) //读取参数和路径输出文件信息
         name[j++]=path[i];
     }
     name[j]='\0';
-    if(lstat(path,&buf)==-1)
+    if(lstat(path,&buf)==-1) 
     my_err("lstat",__LINE__);
     switch(flag)
     {
@@ -212,7 +211,71 @@ void printf_file(int flag,char* path) //读取参数和路径输出文件信息
  
 }
 
-void printf_dir(int flag,char* path) //输出目录内的文件信息
+void printf_dir2(int flag,char* path) //输出目录内的文件信息
+{
+     
+    char filename[256][PATH_MAX+1];
+    DIR* dir;
+    struct dirent *ptr;
+    int i=0,j=0;
+    int s=0;//计数
+    char temp[PATH_MAX];
+    struct stat buf;
+    int len; //记录路径名长度
+    if((dir=opendir(path))==NULL)
+    my_err("opendir",__LINE__);
+    while((ptr=readdir(dir))!=NULL) //将目录里的文件名存到数组中
+    {
+        if((flag&flag_a)==0)
+        if(ptr->d_name[0]=='.')
+        continue;
+        strcpy(filename[i],path);
+       strcat(filename[i],ptr->d_name);
+        i++;
+        s++;
+     
+    }
+    len_max=strlen(filename[1]);
+    for(i=0;i<s-1;i++)      //冒泡排序将文件名进行字典排序
+    for(j=0;j<s-1-i;j++)
+    {
+       
+        if(strlen(filename[j])>strlen(filename[j+1]))
+        {
+           strcpy(temp,filename[j]);
+           strcpy(filename[j],filename[j+1]);
+           strcpy(filename[j+1],temp);
+            len_max=strlen(filename[j]);
+        }
+    }
+    closedir(dir);
+    printf("\n%s:\n",path);
+    for(i=0;i<s;i++)
+    printf_file(flag,filename[i]);
+    printf("\n");
+    for(i=0;i<s;i++)
+    {
+    
+       if(lstat(filename[i],&buf)==-1)
+        my_err("lstat",__LINE__);
+       len=strlen(filename[i]);
+        if(S_ISDIR(buf.st_mode)&&panduan(filename[i]))
+        {
+          if(filename[i][len-1]!='/')
+        {
+            filename[i][len]='/';
+            filename[i][len+1]='\0';
+        }
+        
+      
+            printf_dir2(flag,filename[i]);
+
+        }
+
+    }
+}
+
+void printf_dir1(int flag,char* path) //输出目录内的文件信息
 {
      
     char filename[256][PATH_MAX+1];
@@ -233,12 +296,14 @@ void printf_dir(int flag,char* path) //输出目录内的文件信息
        strcat(filename[i],ptr->d_name);
         i++;
         s++;
+       if(s>256)
+        my_err("too many files under this dir",__LINE__);
     }
-    len_max=strlen(filename[s-1]);
+    len_max=strlen(filename[1]);
     for(i=0;i<s-1;i++)      //冒泡排序将文件名进行字典排序
     for(j=0;j<s-1-i;j++)
     {
-      
+       
         if(strlen(filename[j])>strlen(filename[j+1]))
         {
            strcpy(temp,filename[j]);
@@ -247,23 +312,10 @@ void printf_dir(int flag,char* path) //输出目录内的文件信息
             len_max=strlen(filename[j]);
         }
     }
+    closedir(dir);
+ 
     for(i=0;i<s;i++)
     {
-        struct stat buf;
-        
-       if(lstat(filename[i],&buf)==-1)
-        my_err("lstat",__LINE__);
-        if(S_ISDIR(buf.st_mode)&&((flag&flag_R)!=0)&&panduan(filename[i]))
-        {
-           if(filename[i][(strlen(filename[i])-1)]!='/')
-            {
-            filename[i][strlen(filename[i])]='/';
-            filename[i][strlen(filename[i])+1]='\0';
-            }
-          printf("\n%s:\n",filename[i]);
-          printf_dir(flag,filename[i]);
-        }
-        else
        printf_file(flag,filename[i]);
     }
       if((flag&flag_l)==0)
@@ -313,8 +365,12 @@ int main(int argc,char** argv)
     }
       if(s+1==argc)
         {
+
         strcpy(path,"./");
-        printf_dir(flag,path);    
+            if((flag&flag_R)==0)
+        printf_dir1(flag,path);
+            else
+            printf_dir2(flag,path);
         }
     for(i=s+1;i<argc;i++)
     {
@@ -324,12 +380,26 @@ int main(int argc,char** argv)
         my_err("stat",__LINE__);
         if(S_ISDIR(buf.st_mode))
         {
+            if((flag&flag_R)==0)
+            {
+                
             if(path[(strlen(path)-1)]!='/')
             {
             path[strlen(path)]='/';
             path[strlen(path)+1]='\0';
             }
-           printf_dir(flag,path);
+           printf_dir1(flag,path);
+
+            }
+            else
+            {
+               if(path[(strlen(path)-1)]!='/')
+             {
+              path[strlen(path)]='/';
+              path[strlen(path)+1]='\0';
+             }
+              printf_dir2(flag,path);
+            }        
         }
         else
         printf_file(flag,path);
