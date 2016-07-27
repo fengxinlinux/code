@@ -172,6 +172,8 @@ int find_command(char* command)       //查找命令是否存在
     DIR* dp;
     struct dirent * dir;
     int i=0;
+    if(strncmp(command,"./",2)==0)
+    command=command+2;
     for(i=0;i<3;i++)
     {
         if((dp=opendir(path[i]))==NULL)
