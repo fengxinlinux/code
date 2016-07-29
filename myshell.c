@@ -220,8 +220,18 @@ void do_command(int sum,char arglist[100][256])    //执行命令
         i=0;
         while(arg[i]!=NULL)
         i++;
+        if(strcmp(arg[i-1],"&")==0)
+        {
+            arg[i-1]="--color=auto";
+            arg[i]="&";
+            arg[i+1]=NULL;
+        }
+        else
+        {
         arg[i]="--color=auto";
         arg[++i]=NULL;
+
+        }
     }
 
     for(i=0;arg[i]!=NULL;i++)  //判断是否含有&
