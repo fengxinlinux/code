@@ -229,7 +229,7 @@ void do_command(int sum,char arglist[100][256])    //执行命令
     
         if(strcmp(arg[i],"&")==0)
         {
-            if(arg[i+1]!=NULL)
+            if(arg[i+1]!=NULL&&strcmp(arg[0],"ls")!=0)
             {
                 printf("wrong command\n");
                 return;
