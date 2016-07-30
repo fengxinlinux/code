@@ -195,7 +195,7 @@ void do_command(int sum,char arglist[100][256])    //执行命令
 {
     int flag =0;      //若flag>1,说明命令中含多个>,<,|或格式不正确
     int how=0;    //记录命令中是否含有>,<,|
-    int background;  //记录命令中是否有&
+    int background=0;  //记录命令中是否有&
     pid_t pid;
     int fd;
     int i;
