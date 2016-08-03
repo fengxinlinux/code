@@ -66,7 +66,7 @@ int do_scan(struct sockaddr_in serv_addr)
 
 void * scaner(void* arg)
 {
-    unsigned short int i;
+    unsigned int i;
     struct sockaddr_in serv_addr;
     port_segment portinfo;
     memcpy(&portinfo,arg,sizeof(struct port_segment));
