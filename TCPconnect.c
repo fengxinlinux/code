@@ -59,7 +59,7 @@ int do_scan(struct sockaddr_in serv_addr)
     {
         printf("port %d found in %s\n",ntohs(serv_addr.sin_port),inet_ntoa(serv_addr.sin_addr));
         close(conn_fd);
-        return -1;
+        return 1;
     }
     return -1;
 }
