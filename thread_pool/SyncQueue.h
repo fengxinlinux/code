@@ -69,7 +69,7 @@ public:
         m_queue.pop_front();
         m_notFull.notify_one();
     }
-
+    
     //终止同步队列
     void Stop()
     {
