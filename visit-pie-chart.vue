@@ -1,7 +1,7 @@
 <template>
   <div>
     <div id="visitPieChart" style="width:100%;height:400px;"></div>
-    <!-- <p>{{alldata}}</p> -->
+   <!-- <p>{{alldata}}</p> -->
   </div>
 </template>
 
@@ -115,17 +115,16 @@
       getData() {
         this.pieData.bounceCount = this.pieData.nbPageviews = 0;
         this.pieData.nbUniqVisitors = this.pieData.nbVisitsReturning = 0;
-        for (let i = 0; i < this.alldata[i].length; i++) {
+        for (let i = 0; i < this.alldata.length; i++) {
           this.pieData.bounceCount += this.alldata[i].bounceCount;
-          this.pieData.nbPageviews = this.alldata[i].nbPageviews;
-          this.pieData.nbUniqVisitors = this.alldata[i].nbUniqVisitors;
-          this.pieData.nbVisitsReturning = this.alldata[i].nbVisitsReturning;
+          this.pieData.nbPageviews += this.alldata[i].nbPageviews;
+          this.pieData.nbUniqVisitors += this.alldata[i].nbUniqVisitors;
+          this.pieData.nbVisitsReturning += this.alldata[i].nbVisitsReturning;
         }
       },
       updateCharts() {
         let _this = this;
         _this.getData();
-
         _this.myChart.clear();
         var option = {
           title: [{

@@ -143,19 +143,19 @@
       updateData() {
         var dataList = {};
         this.scoreData1 = [];
-        for (let i = 0; i < this.data[i].length; i++) {
-          dataList.day = this.data[i].day;
-          dataList.nbPageviews = this.data[i].nbPageviews;
-          dataList.nbDownloads = this.data[i].nbDownloads;
-          dataList.nbSearches = this.data[i].nbSearches;
-          dataList.nbUsers = this.data[i].nbUsers;
-          dataList.avgTimeOnSite = this.data[i].avgTimeOnSite;
-          dataList.nbActions = this.data[i].nbActions;
-          dataList.normalVisit = this.data[i].nbPageviews - this.data[i].bounceCount;
-          dataList.bounceCount = this.data[i].bounceCount;
-          dataList.newUser = this.data[i].nbUniqVisitors - this.data[i].nbVisitsReturning;
-          dataList.nbVisitsReturning = this.data[i].nbVisitsReturning;
-          this.scoreData1.push(dataList);
+        for (let i = 0; i < this.alldata.length; i++) {
+          dataList.day = this.alldata[i].day;
+          dataList.nbPageviews = this.alldata[i].nbPageviews;
+          dataList.nbDownloads = this.alldata[i].nbDownloads;
+          dataList.nbSearches = this.alldata[i].nbSearches;
+          dataList.nbUsers = this.alldata[i].nbUsers;
+          dataList.avgTimeOnSite = this.alldata[i].avgTimeOnSite;
+          dataList.nbActions = this.alldata[i].nbActions;
+          dataList.normalVisit = this.alldata[i].nbPageviews - this.alldata[i].bounceCount;
+          dataList.bounceCount = this.alldata[i].bounceCount;
+          dataList.newUser = this.alldata[i].nbUniqVisitors - this.alldata[i].nbVisitsReturning;
+          dataList.nbVisitsReturning = this.alldata[i].nbVisitsReturning;
+          this.scoreData1[i]=JSON.parse(JSON.stringify(dataList));
         }
       },
       exportData(type) {
